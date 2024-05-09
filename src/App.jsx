@@ -1,3 +1,67 @@
+const API_KEY = 'e07ff3f0a793158b92b5bb6029b2ce4a';
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+const SEARCH_URL = `${BASE_URL}/search/movie`;
+
+const gallery = document.getElementById('gallery');
+const searchInput = document.getElementById('searchInput');
+
+// Fetch movie data from TMDb API
+async function fetchMovies(query) {
+  const url = `${SEARCH_URL}?api_key=${API_KEY}&query=${query}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data.results;
+}
+
+// Render movies
+function renderMovies(movies) {
+  gallery.innerHTML = '';
+
+  movies.forEach(movie => {
+    const movieElement = document.createElement('div');
+    movieElement.classList.add('movie');
+
+    const image = document.createElement('img');
+    image.src = `${IMAGE_BASE_URL}/${movie.poster_path}`;
+    image.alt = movie.title;
+
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay');
+
+    const overlayContent = document.createElement('div');
+    overlayContent.classList.add('overlay-content');
+    overlayContent.textContent = movie.title;
+
+    overlay.appendChild(overlayContent);
+    movieElement.appendChild(image);
+    movieElement.appendChild(overlay);
+
+    // Open movie link on click
+    movieElement.addEventListener('click', () => {
+      const movieId = movie.id;
+      const movieUrl = `https://filmku.online/embed/${movieId}`;
+
+
+      window.open(movieUrl, '_blank');
+    });
+
+    gallery.appendChild(movieElement);
+  });
+}
+
+// Perform search on input change
+searchInput.addEventListener('input', async () => {
+  const query = searchInput.value;
+  if (query.trim() !== '') {
+    const movies = await fetchMovies(query);
+    renderMovies(movies);
+  } else {
+    gallery.innerHTML = '';
+  }
+});
+
+
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { fetchDataFromApi } from "./utils/api";
